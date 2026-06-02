@@ -27,7 +27,7 @@ body {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   background: linear-gradient(180deg, #0a2242 0%, #051127 100%);
 }
 
@@ -172,4 +172,100 @@ button:disabled {
   .chord-button.triad-main {
     font-size: 15px;
   }
+}
+
+/* Piano Wrapper Layout */
+.piano-container {
+  width: 100%;
+  background-color: #112a4d;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #4b5568;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.piano-keyboard {
+  display: flex;
+  position: relative;
+  background: #051127;
+  padding: 4px;
+  border-radius: 6px;
+  overflow-x: auto;
+  width: 100%;
+  height: 80px;
+  /* Controls the total vertical length of the keys */
+  box-sizing: border-box;
+}
+
+/* White Keys Configuration */
+.piano-key.white-key {
+  flex: 1;
+  min-width: 24px;
+  background: linear-gradient(to bottom, #eeeeee 0%, #ffffff 100%);
+  border: 1px solid #b5b5b5;
+  border-radius: 0 0 4px 4px;
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Black Keys Overlapping Configuration */
+.piano-key.black-key {
+  width: 14px;
+  height: 60%;
+  background: linear-gradient(to bottom, #333333 0%, #000000 100%);
+  border: 1px solid #111;
+  border-radius: 0 0 3px 3px;
+  margin-left: -7px;
+  margin-right: -7px;
+  z-index: 2;
+  position: relative;
+  cursor: pointer;
+}
+
+/* Highlight Press Interactions */
+.piano-key.white-key.key-pressed {
+  background: linear-gradient(to bottom, #aed2f6 0%, #6cb0f2 100%) !important;
+  border-color: #4384c4;
+}
+
+.piano-key.black-key.key-pressed {
+  background: linear-gradient(to bottom, #2b5d8f 0%, #4681bd 100%) !important;
+  border-color: #1d436b;
+}
+
+/* Status dots at the bottom of standard pressed keys */
+.key-marker {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #0c335e;
+  border-radius: 50%;
+}
+
+.piano-key.black-key .key-marker {
+  background-color: #ffffff;
+  bottom: 6px;
+}
+
+/* Prevent ugly text highlight artifacts when rapid hold-pressing buttons */
+.chord-button {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* Updated active pressed state styling */
+.chord-button.chord-active {
+  background-color: #2b5d8f !important;
+  border-color: #4681bd !important;
+  color: #ffffff !important;
+  transform: translateY(2px);
 }
