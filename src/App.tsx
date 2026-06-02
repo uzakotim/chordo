@@ -246,9 +246,6 @@ function App() {
             {isRecording ? "Stop Record" : "Record"}
           </button>
           <button onClick={onExportMidi} type="button" disabled={recordedChords.length === 0}>
-            {isRecording ? "Stop Record" : "Record"}
-          </button>
-          <button onClick={onExportMidi} type="button" disabled={recordedChords.length === 0}>
             Export MIDI
           </button>
           <span>{recordedChords.length} events</span>

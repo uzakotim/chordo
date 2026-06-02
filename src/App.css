@@ -93,82 +93,83 @@ button:disabled {
   border-color: #b55e75;
 }
 
-.chord-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(90px, 1fr));
-  gap: 10px;
-}
-
-.chord-button {
-  min-height: 50px;
-  background-color: #4e5665;
-  border-color: #7a8290;
-  font-weight: 600;
-}
-
-.chord-button:active {
-  transform: translateY(1px);
-  background-color: #616b7d;
-}
-
-@media (max-width: 860px) {
-  .chord-grid {
-    grid-template-columns: repeat(4, minmax(90px, 1fr));
-  }
-}
-
-@media (max-width: 560px) {
-  .chord-grid {
-    grid-template-columns: repeat(2, minmax(90px, 1fr));
-  }
-
-  .controls {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
+/* --- Chord Grid Setup (Cleaned & Expanded) --- */
 .chord-grid {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  background-color: #081d3a;
-  padding: 8px;
-  border-radius: 6px;
-  max-width: 800px;
-  margin: 20px auto;
+  gap: 6px;
+  background-color: #112a4d;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #4b5568;
+
+  /* Makes the grid stretch across the entire available width */
+  width: 100%;
+  box-sizing: border-box;
+  margin: 10px 0;
 }
 
 .chord-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 
 .chord-button {
-  background-color: #fcfcff;
-  border: 1px solid #081d3a;
+  background-color: #4e5665;
+  border: 1px solid #7a8290;
+  color: #ffffff;
   padding: 12px 4px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   text-align: center;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  color: #1a1a1a;
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
+
+  /* Increased minimum height to make the grid block taller */
+  min-height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chord-button:hover:not(:disabled) {
-  background-color: #7f899a;
+  background-color: #5d677a;
+  border-color: #8e98a8;
+}
+
+.chord-button:active:not(:disabled) {
+  transform: translateY(1px);
+  background-color: #3d4554;
 }
 
 .chord-button.triad-main {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 18px;
+  background-color: #5c667a;
+  border-color: #9ba5b8;
 }
 
 .chord-button.empty-slot {
   background-color: transparent;
   border: 1px solid transparent;
   pointer-events: none;
+}
+
+/* --- Media Queries for Responsive Scale Row Densities --- */
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chord-button {
+    font-size: 13px;
+    min-height: 55px;
+  }
+
+  .chord-button.triad-main {
+    font-size: 15px;
+  }
 }
