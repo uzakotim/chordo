@@ -134,10 +134,13 @@ function chordToMidiNotes(chord: string): number[] {
 
   const base = 60 + rootSemitone;
 
-  let intervals = [0, 4, 7];
+  let intervals = [0, 4, 7]; // Default Major Triad
 
-  if (extension === "m" || (extension.startsWith("m7") && extension !== "m7b5")) {
+  // FIX: Separate basic minor (m) from minor seventh (m7)
+  if (extension === "m") {
     intervals = [0, 3, 7];
+  } else if (extension === "m7") {
+    intervals = [0, 3, 7, 10]; // Now properly plays 4 notes!
   } else if (extension === "dim") {
     intervals = [0, 3, 6];
   } else if (extension === "sus2") {
