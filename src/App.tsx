@@ -5,7 +5,7 @@ import "./App.css";
 type KeyMode = "maj" | "min";
 
 type ChordEvent = {
-  chord: string | null; // Changed to allow null, representing a 'rest/pause' when unheld
+  chord: string | null;
   timestampMs: number;
 };
 
@@ -46,6 +46,77 @@ const PIANO_OCTAVE_PATTERN = [
   { note: "A#", isBlack: true },
   { note: "B", isBlack: false },
 ];
+
+// --- Audio Synthesis Setup Engine ---
+// Initialize Web Audio context lazily upon user interaction
+let audioCtx: AudioContext | null = null;
+// Active oscillators pool tracking to stop them dynamically on chord release
+let activeOscillators: { osc: OscillatorNode; gainNode: GainNode }[] = [];
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") {
+    void audioCtx.resume();
+  }
+}
+
+function midiNoteToFrequency(note: number): number {
+  return 440 * Math.pow(2, (note - 69) / 12);
+}
+
+function playPianoChord(midiNotes: number[]) {
+  initAudio();
+  if (!audioCtx) return;
+
+  // Clear any hanging lingering chord notes first
+  stopPianoChord();
+
+  const now = audioCtx.currentTime;
+
+  midiNotes.forEach((note) => {
+    if (!audioCtx) return;
+
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    // A blend of standard Sine and Triangle mimics an organic Fender Rhodes / clean digital key tone
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(midiNoteToFrequency(note), now);
+
+    // ADSR Attack and Initial Peak configuration
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(0.2, now + 0.01); // Quick non-clicking strike attack
+    gainNode.gain.exponentialRampToValueAtTime(0.08, now + 0.4); // Subtle natural string decay profile
+
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    osc.start(now);
+
+    activeOscillators.push({ osc, gainNode });
+  });
+}
+
+function stopPianoChord() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+
+  activeOscillators.forEach(({ osc, gainNode }) => {
+    try {
+      // Gently ramp down to zero over 0.05 seconds to avoid abrasive audio pops/clicks
+      gainNode.gain.cancelScheduledValues(now);
+      gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.stop(now + 0.06);
+    } catch (e) {
+      // Fallback structural safety check if oscillator was dead
+    }
+  });
+  activeOscillators = [];
+}
+// --- End Audio Synthesis Setup ---
 
 function buildChordLabel(root: string, quality: string): string {
   if (quality === "maj") return root;
@@ -123,14 +194,11 @@ function buildMidiBytes(events: ChordEvent[]): Uint8Array {
   noteEvents.push({ tick: 0, bytes: [0xff, 0x51, 0x03, 0x07, 0xa1, 0x20] });
 
   events.forEach((event, index) => {
-    // If this event marks a pause/rest, don't trigger new note on events
     if (!event.chord) return;
 
     const startTick = Math.max(0, Math.round(event.timestampMs * ticksPerMillisecond));
     const next = events[index + 1];
 
-    // Crucial: The chord ends either when the user releases it (next event is null chord),
-    // or when they change to a different chord.
     const endMs = next ? next.timestampMs : event.timestampMs + 500;
     const durationTicks = Math.max(120, Math.round((endMs - event.timestampMs) * ticksPerMillisecond));
     const endTick = startTick + durationTicks;
@@ -225,6 +293,10 @@ function App() {
     if (!chord) return;
     setActiveChord(chord);
 
+    // Audio Trigger: Parse string into midi intervals and play through speakers
+    const notesToPlay = chordToMidiNotes(chord);
+    playPianoChord(notesToPlay);
+
     await invoke("log_chord_press", { chord, key: selectedKey, keyMode });
 
     if (!isRecording || recordingStartedAt === null) return;
@@ -236,12 +308,16 @@ function App() {
   }
 
   function handleChordUp() {
-    // Only register a rest event if there was actually a chord playing
-    if (activeChord && isRecording && recordingStartedAt !== null) {
-      setRecordedChords((prev) => [
-        ...prev,
-        { chord: null, timestampMs: Date.now() - recordingStartedAt },
-      ]);
+    if (activeChord) {
+      // Audio Release: Stop the current active synthesizer nodes smoothly
+      stopPianoChord();
+
+      if (isRecording && recordingStartedAt !== null) {
+        setRecordedChords((prev) => [
+          ...prev,
+          { chord: null, timestampMs: Date.now() - recordingStartedAt },
+        ]);
+      }
     }
     setActiveChord(null);
   }
@@ -257,7 +333,6 @@ function App() {
     setRecordingStartedAt(null);
   }
 
-  // Helper calculation to ensure rests/pauses don't inflate the event counter display
   const totalPlayableEvents = useMemo(() => {
     return recordedChords.filter(e => e.chord !== null).length;
   }, [recordedChords]);
