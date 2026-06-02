@@ -1,18 +1,10 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
-}
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 1.4;
   font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
+  color: #ffffff;
+  background-color: #081d3a;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,96 +13,117 @@
   -webkit-text-size-adjust: 100%;
 }
 
-.container {
+body {
   margin: 0;
-  padding-top: 10vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  text-align: center;
+  gap: 20px;
+  background: linear-gradient(180deg, #0a2242 0%, #051127 100%);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
+.controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px;
+  border: 1px solid #4b5568;
+  border-radius: 12px;
+  background-color: #112a4d;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.key-config,
+.record-config {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
 }
 
-a:hover {
-  color: #535bf2;
+label {
+  color: #d7dde8;
+  font-size: 0.95rem;
 }
 
-h1 {
-  text-align: center;
-}
-
-input,
+select,
 button {
+  border: 1px solid #6c7482;
+  background-color: #3d4656;
+  color: #ffffff;
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
+  padding: 8px 12px;
+  font-size: 0.95rem;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
+button:hover,
+select:hover {
+  border-color: #8a93a4;
+  background-color: #4a5568;
 }
 
-input,
-button {
-  outline: none;
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-#greet-input {
-  margin-right: 5px;
+.selected-key {
+  font-weight: 600;
+  color: #e3e8f0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
+.is-active {
+  background-color: #7f899a;
+  border-color: #aab2be;
+}
+
+.is-recording {
+  background-color: #8a3d52;
+  border-color: #b55e75;
+}
+
+.chord-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.chord-button {
+  min-height: 50px;
+  background-color: #4e5665;
+  border-color: #7a8290;
+  font-weight: 600;
+}
+
+.chord-button:active {
+  transform: translateY(1px);
+  background-color: #616b7d;
+}
+
+@media (max-width: 860px) {
+  .chord-grid {
+    grid-template-columns: repeat(4, minmax(90px, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .chord-grid {
+    grid-template-columns: repeat(2, minmax(90px, 1fr));
   }
 
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
